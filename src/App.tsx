@@ -20,7 +20,10 @@ import {
   ChevronDown,
   Moon,
   Sun,
-  Activity
+  Activity,
+  Download,
+  Upload,
+  Settings
 } from 'lucide-react';
 
 // --- Types ---
@@ -300,6 +303,62 @@ export default function App() {
     setCards(prev => prev.filter(c => c.id !== id));
   };
 
+  const exportData = () => {
+    const data = {
+      cards,
+      history: reviewHistory,
+      version: '1.0',
+      exportedAt: new Date().toISOString()
+    };
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `recall_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target?.result as string);
+        let newCards: Card[] = [];
+        let newHistory: Record<string, number> = {};
+
+        if (Array.isArray(imported)) {
+          newCards = imported;
+        } else if (imported.cards && Array.isArray(imported.cards)) {
+          newCards = imported.cards;
+          newHistory = imported.history || {};
+        } else {
+          return;
+        }
+
+        // Basic validation
+        const isValid = newCards.every(c => c.id && c.content && c.cluster);
+        if (isValid) {
+          setCards(newCards);
+          if (Object.keys(newHistory).length > 0) {
+            setReviewHistory(newHistory);
+          }
+        }
+      } catch (err) {
+        console.error("Import failed", err);
+      }
+    };
+    reader.readAsText(file);
+    // Reset input
+    e.target.value = '';
+  };
+
   const heatmapData = useMemo(() => {
     const data = [];
     const now = new Date();
@@ -548,6 +607,41 @@ export default function App() {
                   </div>
                 </div>
               </div>
+            </section>
+
+            {/* Data Management */}
+            <section className="pb-12">
+              <div className="flex items-center gap-2 mb-6">
+                <Settings size={20} className="text-indigo-600" />
+                <h2 className={`text-xs font-black uppercase tracking-[0.15em] ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Data Management</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={exportData}
+                  className={`p-5 rounded-3xl border flex flex-col items-center justify-center gap-3 transition-all active:scale-95 ${isDarkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-slate-100 text-slate-900'} shadow-sm`}
+                >
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${isDarkMode ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-50 text-indigo-600'}`}>
+                    <Download size={20} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Export JSON</span>
+                </button>
+                
+                <label className={`p-5 rounded-3xl border flex flex-col items-center justify-center gap-3 transition-all active:scale-95 cursor-pointer ${isDarkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-slate-100 text-slate-900'} shadow-sm`}>
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-50 text-purple-600'}`}>
+                    <Upload size={20} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Import JSON</span>
+                  <input 
+                    type="file" 
+                    accept=".json" 
+                    onChange={importData} 
+                    className="hidden" 
+                  />
+                </label>
+              </div>
+              <p className="mt-4 text-[9px] text-slate-400 text-center font-medium uppercase tracking-widest">
+                Back up your cards or restore from a previous session
+              </p>
             </section>
           </div>
         ) : (
