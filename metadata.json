@@ -1,0 +1,5 @@
+{
+  "name": "Recall",
+  "description": "A smart PWA for card-based revision with AI-powered clustering and spaced repetition.",
+  "requestFramePermissions": []
+}
