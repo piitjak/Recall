@@ -1,8 +1,5 @@
 # Recall - Software Documentation
 
-
-
-
 ## 1. Software Requirements Specification (SRS)
 
 ### 1.1 Functional Requirements
@@ -26,6 +23,7 @@
 *   **Usability**: Mobile-first design with large touch targets (min 44px) and high-contrast typography.
 *   **Offline Capability**: The app must be fully functional without an internet connection (Offline-first).
 *   **Readability**: High-contrast color palettes and "Black" font weights for maximum legibility.
+
 
 ---
 
