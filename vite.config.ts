@@ -7,7 +7,8 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
-    base: env.VITE_BASE_PATH || '/',
+    // Use root base path in AI Studio (development), but allow custom base for production (GitHub Pages)
+    base: mode === 'production' ? (env.VITE_BASE_PATH || '/') : '/',
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
