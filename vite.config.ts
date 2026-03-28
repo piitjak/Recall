@@ -7,8 +7,8 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
-    // Use the repository name as the base path for GitHub Pages
-    base: mode === 'production' ? (env.VITE_BASE_PATH || '/Recall/') : '/',
+    // Use relative base path in production for GitHub Pages compatibility
+    base: mode === 'production' ? './' : '/',
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },

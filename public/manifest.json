@@ -2,7 +2,7 @@
   "name": "Recall Cards",
   "short_name": "Recall",
   "description": "A smart spaced repetition flashcard app.",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
